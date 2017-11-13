@@ -1,0 +1,118 @@
+- Setup environment for React Native
+- Studied about methods limit in DEX file
+- Explored the use cases of React Native
+- Read about Instagram Developers integrating Android code with React Native
+
+// Common Bug
+Problem: 'run-android' command is not recognized.
+Solution: What caused this for me was running npm install --save [package] when actually the 
+system has previously been using yarn instead of npm.
+To solve this I just deleted the node_modules folder and ran: yarn install and after that 
+react-native run-ios (or android) works fine.
+
+
+Android application (APK) files contain executable bytecode files in the form of Dalvik Executable (DEX) files, 
+which contain the compiled code used to run your app. The Dalvik Executable specification limits the total 
+number of methods that can be referenced within a single DEX file to 65,536, including Android framework 
+methods, library methods, and methods in your own code. Getting past this limit requires that you configure 
+your app build process to generate more than one DEX file, known as a multidex configuration.
+
+So, the feature is: it allows your complex app to compile. The scenarios for using it are when your app fails 
+to compile due to hitting the 64K DEX method reference limit. This appears as a build error, such as:
+
+Conversion to Dalvik format failed: Unable to execute dex: method ID not in [0, 0xffff]: 65536
+
+NewsAPI.org Key: 89a3f07276aa407ead637fbfffc7c3e4
+
+https://newsapi.org/v1/articles?source=the-times-of-india&sortBy=top&apiKey=89a3f07276aa407ead637fbfffc7c3e4
+
+
+Note- The folder name of the project should always match with the App name passed to the second argument of the 
+registerComponent() method in the index.js file, otherwise an error will occur while running the App in the emulator.
+
+// Flexbox
+
+justifyContent => Move the items in the vertical direction. // flex-end, center, flex-start,
+                                                                    space-between, space-around
+
+alignItems => Move the items in the horizontal direction. // flex-start, flex-end, center,
+
+Note- The default rule of the flex-direction is the 'column' in React Native.
+
+
+// Images in React Native
+
+<Image source={{uri: require('../../....')}} />
+
+Image will not expand to fill the space available to it, rather we are required to provide a styling
+rule, that tells the image tag exactly how big the image should be.
+
+// Full Width Images
+
+To make the image render to the full width of the screen, just provide the parent View of the image
+with the flex-direction of 'row' and give the following styles to the Image component.
+
+flex: 1,
+width: null,
+height: 300         // any fixed height
+
+
+// Shadow Props
+
+Shadow property in the styles object does not work for components that are rendered on the android 
+devices.
+
+We are required to install a third party module called 'react-native-shadow' to apply BoxShadow
+to the components in an android app.
+
+elevation: 2,
+position: 'relative'
+
+
+// Lifecycle methods
+
+They are only available in the class based components. 
+
+componentWillMount() - Anytime our component is about to render on the screen.
+
+// Making HTTP Request 
+
+We are required to install a library called axios, to make ajax requests from class based components (usually in the
+lifecycle methods).
+
+// Refering to child elements of the parent component
+
+We use 'props.children' to refer to the child elements which we pass in between the tags of the
+parent component.
+
+
+// Scrolling 
+
+Unlike the browser, by default the scrolling behaviour in React Native is not present. To make an element 
+scrollable, we need to do the following 2 steps:
+
+1. Identify the component which we want to be scrollable(in this case NewsList component)
+Because we want everything inside this view to be scrollable.
+
+2. Replace the View container of this component with a ScrollView component.
+
+3. We provide a style of flex: 1, to the root view(to take the full area of the screen).
+
+Note- By default, the display property of all the View component is set to 'flex'.
+
+
+// Buttons
+
+<TouchableOpacity onPress={handlerFunction()}>
+    <Text>Click Here</Text>
+</TouchableOpacity> 
+
+
+// Linking Apps installed in the device
+
+To navigate the user to any other app installed in the device, we have to use the Linking library(found in the API 
+section of the React Native docs). 
+
+openUrl()       // to open up a URL in any of the installed apps.
+
+ 
