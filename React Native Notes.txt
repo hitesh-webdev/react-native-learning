@@ -1,8 +1,3 @@
-- Setup environment for React Native
-- Studied about methods limit in DEX file
-- Explored the use cases of React Native
-- Read about Instagram Developers integrating Android code with React Native
-
 // Common Bug
 Problem: 'run-android' command is not recognized.
 Solution: What caused this for me was running npm install --save [package] when actually the 
@@ -115,4 +110,114 @@ section of the React Native docs).
 
 openUrl()       // to open up a URL in any of the installed apps.
 
- 
+
+// Navigation 
+
+As in the web react-native uses one root view by default (RCTRootView on iOS and View on Android) from which view 
+hierarchy of the react-native application starts.
+
+So it is advised to use native navigation.
+
+
+// index.js
+
+export * from './Header';
+export * from './Button';
+
+We can create a single index.js file and export all the components from a single file inside a module directory.
+
+
+// Form Input Box
+
+<TextInput 
+    autoCorrect={false}             // to prevent auto correct 
+    placeholder="email"
+    secureTextEntry={true}          // For hiding the entered password text
+    value={this.state.text}
+    onChangeText={(text) => this.setState({text: text})}>
+
+Because we call setState, the component will immediately re-render, and when the TextInput re-renders we set it's value
+to this.state.text
+
+
+// Center text on the screen
+
+alignSelf: 'center'                         // similar to text-align: center in CSS
+
+
+// Showing the Loading Spinner(ActivityIndicator)
+
+<ActivityIndicator 
+    size={size || 'large'}      
+/>
+
+
+// Conditional Rendering of JSX
+
+Create a function named 'renderComponent()' and return the JSX of the required component based on the 'if' statement.
+And invoke this function where you want to display that particular component.
+
+Note- We can change as many variables on my state object, in a single call to this.setState() method.
+
+
+// Keeping track of authentication in Firebase
+
+firebase.auth().onAuthStateChanged().then((user) => {    // This function fires off everytime the user logs in or out
+    if(user) {
+        this.setState({ loggedIn: true });
+    } 
+    else {
+        this.setState({ loggedIn: false });
+    }
+});
+
+Note- The correct place to define this function is after the initialization of firebase in the App(root) component
+(in the componentWillMount() lifecycle method).
+
+
+// Redux
+
+The 'Provider' component is allowed to have only a single child component(root component).
+This child component is allowed to have as many child components as required.
+
+Follow 'one reducer one file' rule to keep one to one mapping.
+
+
+// List View
+
+The List View watches for item that are currently visible on the screen.
+The List View uses the same component over and over again, just swiping the data that sits inside of them, and plugs
+in the new data in the same component which was scrolled up out of the screen.
+
+componentWillMount() {
+
+    const ds = new ListView.DataSource({
+        rowHasChanged: (r1, r2) => r1 !== r2
+    });
+
+    this.dataSource = ds.cloneWithRows(this.props.listItems);
+}
+
+renderRow(item) {
+    return <ListItem item={item} />
+}
+
+<ListView 
+    dataSource={this.dataSource}
+    renderRow={this.renderRow}
+/>
+
+
+// Layout Animation in the component
+
+import { LayoutAnimation } from 'react-native';
+
+componentWillUpdate() {
+    LayoutAnimation.spring();
+}
+
+All the updates on the screen will be automatically animated for us in any style possible.
+
+Note- This method has to be called before the component is rendered on the screen.
+
+
