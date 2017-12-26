@@ -1,0 +1,311 @@
+/* Git Notes
+============================================================= */
+
+Git is a map, that is, a table with keys and values.
+
+Any sequence of bytes is a 'value', and Git calculates the 'key' using the SHA1 hash algorithm.
+SHA1 are 20 bytes in hexadecimal format, thus it is a sequence of 40 hex digits.
+
+git cat-file -p <commit_hex_code>               // -p => pretty printing
+
+Note- The first two characters of the commit hex code shows the folder name inside the .git/objects directory,
+where the remaining sequences is stored as a blob file(which contains the text data along with other meta 
+information like parent commit, date, owner, committer,  in encrypted form). 
+
+Note- A blob is not really a file, it is just the content of a file. The file name and file permissions are not
+stored in the blob, they are stored in the tree that points to the blob.
+
+Git stores a new blob every time you change a file. But that's not true in case of very big files. 
+In the object model, many different trees can point to the same blobs. 
+
+
+
+// Master Branch
+
+.git/refs/heads/master
+
+This blob file contains the hex code(SHA1) of the current commit. A pointer to a commit. That's why the directory
+that contains branches is called the refs or references directory.
+
+The file named HEAD in the '.git' folder contains the reference to the pointer to our current branch. 
+ref: refs/heads/master   
+
+// Losing the HEAD
+
+HEAD is just a reference to a branch (pointer to a pointer). When you checkout a branch, that means you are changing
+the HEAD. But we can directly checkout a commit instead of a branch.
+
+git checkout <commit_hex_code>
+
+Now when we make commits to our code, they are not part of any branch. Thus when we checkout again to any of the 
+branches, the HEAD will be moved to that branch's node and hence the latest commits reference will be lost. Thus 
+these commits cannot be referenced anymore by the Git, and eventually will be garbage collected. This will lead to
+the loss of our data. 
+
+Just remember to put a branch on the stuff you care about before you leave it behind.
+
+Note- In Git branches are basically references to commit.
+
+
+
+A git project stores the information in 4 separate storage areas. 
+
+1. Working Area - The project files on which we are currently working on.
+
+2. Index(Staging Area) - This is the area where we keep our files before a commit. 
+
+3. Repository - When you commit stuff, it goes here. It is in the '.git' folder. The most important data is in the 
+directory called 'objects'. 
+
+4. Stash - It's a temporary storage area. 
+
+Note- 'git diff' command gives you the difference between the two areas. If we use this command without any argument
+then it gives the difference between the working area and the index.
+
+// Log
+
+git log
+
+This command will give all the commit logs made in the project since the initial commit.
+
+git log --graph --decorate --oneline
+
+This command will show the graphical representation of the commits and branches with their commit messages.
+
+git log --patch
+
+This command will give a detailed Diff for each commit in the log.
+
+git log -grep apples --oneline
+
+This command will filter those commits which have 'apples' in their commit message.
+
+// Show
+
+git show <commit-hash>
+
+This command will show the changes made in the given commit(specified by the hash code).
+
+git show HEAD
+
+This command can be used to show the changes made in the latest commit. 
+
+git show HEAD^
+
+This command can be used to show the changes made in the parent commit of the latest commit.
+
+git show HEAD^^         or      git show HEAD~2
+
+// Blame
+
+git blame <file_name>
+
+This command is used to see line by line analysis of the current file, that in which commit a particular line
+was changed.
+
+Note- The caret(^) at the beginning of the commit hex code, shows that this is the first commit that added this
+line.
+
+This command can be used to show the changes made in the grandparent commit of the latest commit.
+
+// Diff
+
+'git diff --cached' will give the difference between the working area and the committed repository.
+
+git diff HEAD HEAD~2
+
+This command will give the changes made between the latest commit and the third last commit.
+
+// Branch
+
+'git branch' command will display all the created branches of the current repository. 
+
+git branch <branch_name>
+
+This command will create a new branch with the specified name.
+
+// Checkout
+
+git checkout <branch_name>
+
+It will change the HEAD to the given branch's node in the repository graph. That means
+that the current commit has changed, now we are looking at a different data in the repository.
+It also copied the current data from the repository to both the working area and index area.
+So, now all the three areas will have the same content, and we will have a clean status.
+
+// Removing files from the Index area
+
+git rm --cached <file_name>
+
+If we use this command without arguments then git will delete the specified file from both the working and index area.
+We can use '-f' flag to remove the file from both the areas.
+
+// Moving/Renaming files 
+
+git mv <source_file_name> <destination_file_name>
+
+Git automatically finds out when we are renaming or moving files. It updates the files in both the working area and 
+the index
+
+// Reset
+
+reset moves the current branch to the specified commit, and optionally copies the data from the Repository to 
+the other areas. 
+
+--hard => It copies the new files from the repository area to both the working area and the index.
+
+--mixed => It copies the new files from the repository area to only the index and leaves the working area as it is.
+
+--soft => It leaves both the working area and index as it is.
+
+Note- Doing 'reset' can make some branches unreachable and thus they will be garbage collected by the Git.
+
+// Stash
+
+The data in the stash doesn't change unless you really want it to. 
+
+The stash is like a clipboard(RAM) of your project. It's a place where we store stuff that we want to step aside
+for sometime. And it's a multiple clipboard, we can have as many elements as we want. Each element gets labeled
+with information about the latest commit to make it easier to identify and it also gets a serial ID.
+
+git stash --include-untracked           // to also put the untracked and uncommitted files into the stash area
+
+git stash list          // listing the data present in the stash area
+
+stash@{0}:              // label given to the stash elements
+
+git stash apply         // This will move the data from the stash to the working area and the index
+
+Note- Here we need to give the name of the stash element, if we do not give the name, it will take the most 
+recent stash object by default.
+
+// Merge
+
+git merge <branch_name>
+
+This command will merge the given branch name with the master branch.
+
+Note- "Unmerged path" error will occur while merging two branches when both sides of the merge have modified 
+the file. This error mostly occur when the changes are made at the exact same position in both the files.
+Git cannot decide which of these changes come first and which change should override the other.
+
+In this case, Git will change the file in the working area so we can manually make the changes. 
+
+Now when we have solved the conflict, we are required to tell Git about that. 
+
+To do that we need to perform "git add", to move the made changes into the index area.
+
+
+// To unstage just one file from the last commit repository, we can use 
+
+git reset HEAD <file_name> 
+
+This command will move the copy of the specified file from the last commit into the index.
+
+// To revert a single file/directory into the working area
+
+git checkout HEAD <file_name>
+
+This command will move the copy of the specified file from the last commit into the index as well as the 
+working area.
+
+
+// Rebase
+
+This is a command that changes history. It copies all commits to new commits and thus they are created as 
+new objects. So if we rebase the commits that other people have in their local repository it will lead to a lot 
+of confusion.
+
+Golden Rule - Never rebase a shared commit. That is, never change a shared history.
+
+You can change the order of commits in your repository, squash(combine) multiple commits together into one single
+commit or change commit messages using interactive rebase:
+
+git rebase -i <refernce_to_a_commit>            // origin/master
+
+This command means let me edit history from this commit excluded onwards and opens up a text editor having all the 
+commits instructions line by line. This is a computer program. The program runs on the current commits in the 
+history and the output of the program is a brand new history. 
+
+pick- use the current commit as it is in the new history
+reword - use current commit but change the commit message. 
+squash - use commit, but meld into previous commit.
+
+=> Amending new files into the latest commit
+
+git commit --amend
+
+It will create a new commit node, as commit operation is immutable and also move the HEAD pointer to this latest
+node. Thus the previous node will be garbage collected by the Git.
+
+This command is a history changing command.
+
+
+// Reverting commits
+
+git revert <commit_hex_code>
+
+This command will revert all the changes made in the given commit. 
+
+Note- Be careful when you revert merge commits. It might remove the data added in that commit, but will not change
+the structure of the commit graph. 
+
+Note- It's not a undo operation. The closest command to undo in git is the 'reset' command, which moves the
+HEAD of the repository to the specified commit. All that 'revert' does is write a new commit with new data that is the 
+opposite of the existing data.
+
+
+// Distributed Version Control System
+
+The contents of the .git folder are copied from the remote machine and then the working area files are created 
+on the fly on the host machine. 
+
+Note- For Git the Working area is not very primary, as it can be created anytime on the fly from the blob files 
+in the objects database in the .git folder.
+
+git branch --all 
+
+This command will show all the branches including the remote branches, as well as the current position of the HEAD.
+
+Git tracks a remote by exactly like it tracks local branches, by writing those branches as references in the 
+refs/remote/origin folder. Git will automatically update this information when we connect to a remote.
+
+To avoid maintaining one small file for each branch, Git sometimes compacts some of them into a single file
+called packed-refs, in the objects folder.
+
+git show-ref master
+
+This command will show the Commit Hex Code to which our local and remote master branch are pointing.
+
+Similarly,
+
+git show-ref <branch_name>
+
+will show the Commit Hex Code to which the given branch is pointing.
+
+// Forcing Git Push
+
+git push -f
+
+This command will forcefully pushes our local code to the remote and overwrite the remote commit history, 
+with our local commit history. 
+
+Note- This is not a good idea, as it will create conflicts with all the people who have previous remote history,
+as their local history and they wouldn't be able to push their code to the remote repository.
+
+You "fetch" the changes from the remote, "merge" them into your own repository and then "push" the result to the
+remote repository.
+
+This set of commands are so common while working with distributed git repository, that there is a command called 
+"pull" which peforms both of these actions for us.
+
+So basically you "pull" and then "push".
+
+
+<!----- Dev Quote ----->
+
+If you want complex intelligent behaviour, then come up with simple principles. Because simple principles give
+people the space they need to be flexible and smart, to solve unexpected problems that always arise in a complex 
+environment. 
+
+
